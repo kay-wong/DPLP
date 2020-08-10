@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         path = sys.argv[1]
         print 'Read files from: {}'.format(path)
-        main(path)
+        main(path, False)
     elif len(sys.argv) == 3:
         path = sys.argv[1]
         draw = eval(sys.argv[2])

@@ -17,6 +17,13 @@ def main(fmodel, fvocab, rpath, wpath):
     dr = DocReader()
     clf.loadmodel(fmodel)
     flist = [join(rpath,fname) for fname in listdir(rpath) if fname.endswith('conll')]
+    #Remove duplicates
+    mergepath= rpath.replace('conll', 'merge')
+    merge_flist=[join(mergepath,fname) for fname in listdir(mergepath) if fname.endswith('merge')]
+    merge_flist=[fname.replace('merge', 'conll') for fname in merge_flist]
+    diff_flist = list(set(flist).symmetric_difference(set(merge_flist)))
+    flist= diff_flist
+    print("Processing {} files".format(len(flist)))
     vocab = load(gzip.open(fvocab))
     for (fidx, fname) in enumerate(flist):
         print "Processing file: {}".format(fname)
@@ -76,7 +83,14 @@ def writedoc(doc, fname, wpath):
             line += tok.word + "\t" + tok.lemma + "\t" 
             line += tok.pos + "\t" + tok.deplabel + "\t" 
             line += str(tok.hidx) + "\t" + tok.ner + "\t"
-            line += tok.partialparse + "\t" + str(eduidx) + "\n"
+            try:
+                line += tok.partialparse + "\t" + str(eduidx) + "\n"
+            except Exception as e:
+                print(e)
+                print(tok.partialparse)
+                print("SIDX: {}\nTOK WORD: {}".format(tok.sidx, tok.word))
+                print(eduidx)
+                #break
             fout.write(line)
             # Boundary
             if tok.boundary:
